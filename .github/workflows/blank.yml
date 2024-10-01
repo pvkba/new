@@ -2,13 +2,7 @@ name: "Sonar: SonarQube Web"
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]  # Trigger for PR events
-    paths:
-      - './backend/**'
-      - './frontend/**'
-  push:
-    branches:
-      - main  # Trigger for pushes to the main branch
+    types: [opened, synchronize, reopened]
     paths:
       - './backend/**'
       - './frontend/**'
@@ -18,26 +12,18 @@ permissions:
   contents: read
 
 jobs:
-  Sonar-Scan-Backend:
-    name: SonarQube Scan for Backend Code  
-    if: github.event.action != 'closed'  # No need for this condition on push
+  Sonar-Scan:
+    name: SonarQube Scan for Web Application Code  
     runs-on: ubuntu-latest
     steps:
-      - name: Check for Backend Changes
+      - name: Determine Working Directory and Sonar Token
         run: |
-          echo "Running SonarQube scan for the backend..."
-          echo "Working Directory: ./backend"
-          # Simulate the SonarQube token usage
-          echo "Using SonarQube Token: SONAR_TOKEN_BACKEND"
+          working_dir="${{ github.event.pull_request.head.ref == 'backend' && './backend' || './frontend' }}"
+          #sonar_token="${{ github.event.pull_request.head.ref == 'backend' && secrets.SONAR_TOKEN_BACKEND || secrets.SONAR_TOKEN_FRONTEND }}"
+         
+          echo "Working Directory: $working_dir"
+          #echo "Sonar Token: $sonar_token"
 
-  Sonar-Scan-Frontend:
-    name: SonarQube Scan for Frontend Code  
-    if: github.event.action != 'closed'  # No need for this condition on push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check for Frontend Changes
+      - name: Echo Environment
         run: |
-          echo "Running SonarQube scan for the frontend..."
-          echo "Working Directory: ./frontend"
-          # Simulate the SonarQube token usage
-          echo "Using SonarQube Token: SONAR_TOKEN_FRONTEND"
+          echo "Environment: ${{ github.ref_name }}"
