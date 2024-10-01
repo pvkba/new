@@ -3,10 +3,10 @@ name: "Sonar: SonarQube Web"
 on:
   push:
     branches:
-      - main  # or the branch you are merging into
+      - main  # Replace with your default branch if different
     paths:
-      - './backend/**'
-      - './frontend/**'
+      - './backend/**'  # Monitor changes in the backend folder
+      - './frontend/**'  # Optional: Include frontend if needed
 
 permissions:
   id-token: write
@@ -16,20 +16,23 @@ jobs:
   Sonar-Scan:
     name: SonarQube Scan for Web Application Code  
     runs-on: ubuntu-latest
-    if: github.event.head_commit.message contains 'Merge pull request'  # Only run if the commit message indicates a merge
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
+      # Determine Working Directory (optional based on your setup)
       - name: Determine Working Directory
         run: |
-          working_dir="${{ github.event.head_commit.message == 'Merge pull request' && './backend' || './frontend' }}"
-          echo "Working Directory: $working_dir"
+          if git diff --name-only HEAD^ HEAD | grep -q '^backend/'; then
+            echo "Working Directory: ./backend"
+          else
+            echo "Working Directory: ./frontend"
+          fi
 
       # Backend Steps
       - name: Set Up Python for Backend
-        if: github.event.head_commit.message contains 'backend'
+        if: github.event.head_commit.message contains 'backend'  # This checks if 'backend' was in the commit message
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
@@ -41,11 +44,11 @@ jobs:
       - name: Run Python Unit Tests for Backend
         if: github.event.head_commit.message contains 'backend'
         run: |
-          echo "Running Python Unit Tests in $working_dir"
-          # Uncomment the line below to actually run the tests
+          echo "Running Python Unit Tests in backend"
+          # Uncomment to run actual tests
           # pytest backend --cov=backend --cov-report=xml
 
-      # Frontend Steps
+      # Frontend Steps (if applicable)
       - name: Set Up Node.js for Frontend
         if: github.event.head_commit.message contains 'frontend'
         uses: actions/setup-node@v3
@@ -59,6 +62,6 @@ jobs:
       - name: Run Angular Unit Tests with Coverage
         if: github.event.head_commit.message contains 'frontend'
         run: |
-          echo "Running Angular Unit Tests in $working_dir"
-          # Uncomment the line below to actually run the tests
+          echo "Running Angular Unit Tests"
+          # Uncomment to run actual tests
           # npm run test -- --code-coverage --watch=false
