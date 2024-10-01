@@ -1,11 +1,15 @@
 name: Test Workflow
 
 on:
+  push:
+    paths:
+      - './backend/**'
+      - './frontend/**'
   pull_request:
     paths:
       - './backend/**'
       - './frontend/**'
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
   test:
