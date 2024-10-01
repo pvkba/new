@@ -1,8 +1,9 @@
 name: "Sonar: SonarQube Web"
 
 on:
-  pull_request:
-    types: [closed]  # Trigger on closed pull requests
+  push:
+    branches:
+      - main  # or the branch you are merging into
     paths:
       - './backend/**'
       - './frontend/**'
@@ -15,7 +16,7 @@ jobs:
   Sonar-Scan:
     name: SonarQube Scan for Web Application Code  
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true  # Only run if the PR was merged
+    if: github.event.head_commit.message contains 'Merge pull request'  # Only run if the commit message indicates a merge
     steps:
       - uses: actions/checkout@v3
         with:
@@ -23,22 +24,22 @@ jobs:
 
       - name: Determine Working Directory
         run: |
-          working_dir="${{ github.event.pull_request.head.ref == 'backend' && './backend' || './frontend' }}"
+          working_dir="${{ github.event.head_commit.message == 'Merge pull request' && './backend' || './frontend' }}"
           echo "Working Directory: $working_dir"
 
       # Backend Steps
       - name: Set Up Python for Backend
-        if: github.event.pull_request.head.ref == 'backend'
+        if: github.event.head_commit.message contains 'backend'
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
       - name: Install Dependencies for Backend
-        if: github.event.pull_request.head.ref == 'backend'
+        if: github.event.head_commit.message contains 'backend'
         run: python -m pip install -r backend/requirements.txt
 
       - name: Run Python Unit Tests for Backend
-        if: github.event.pull_request.head.ref == 'backend'
+        if: github.event.head_commit.message contains 'backend'
         run: |
           echo "Running Python Unit Tests in $working_dir"
           # Uncomment the line below to actually run the tests
@@ -46,17 +47,17 @@ jobs:
 
       # Frontend Steps
       - name: Set Up Node.js for Frontend
-        if: github.event.pull_request.head.ref == 'frontend'
+        if: github.event.head_commit.message contains 'frontend'
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
 
       - name: Install Dependencies for Frontend
-        if: github.event.pull_request.head.ref == 'frontend'
+        if: github.event.head_commit.message contains 'frontend'
         run: npm ci
 
       - name: Run Angular Unit Tests with Coverage
-        if: github.event.pull_request.head.ref == 'frontend'
+        if: github.event.head_commit.message contains 'frontend'
         run: |
           echo "Running Angular Unit Tests in $working_dir"
           # Uncomment the line below to actually run the tests
