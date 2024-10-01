@@ -24,7 +24,6 @@ jobs:
       - name: Determine Working Directory
         run: |
           working_dir="${{ github.event.pull_request.head.ref == 'backend' && './backend' || './frontend' }}"
-         
           echo "Working Directory: $working_dir"
 
       # Backend Steps
