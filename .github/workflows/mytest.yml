@@ -1,4 +1,4 @@
-name: Pull Request Workflow
+name: "Sonar: SonarQube Web"
 
 on:
   pull_request:
@@ -7,12 +7,29 @@ on:
       - './backend/**'
       - './frontend/**'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  test:
+  Sonar-Scan:
+    name: SonarQube Scan for Web Application Code  
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-        
-      - name: Run Tests
-        run: echo "Running tests for changed code!"
+      - name: Determine Working Directory and Sonar Token
+        id: vars
+        run: |
+          if [[ "${{ github.event.pull_request.head.ref }}" == "backend" ]]; then
+            echo "Working Directory: ./backend"
+            echo "Sonar Token: ${{ secrets.SONAR_TOKEN_BACKEND }}"
+          elif [[ "${{ github.event.pull_request.head.ref }}" == "frontend" ]]; then
+            echo "Working Directory: ./frontend"
+            echo "Sonar Token: ${{ secrets.SONAR_TOKEN_FRONTEND }}"
+          else
+            echo "No valid working directory found."
+            exit 1
+          fi
+
+      - name: Echo Environment
+        run: |
+          echo "Environment: ${{ github.ref_name }}"
