@@ -2,16 +2,11 @@ name: "Sonar: SonarQube Web"
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [closed]  # Trigger on closed pull requests
     paths:
       - './backend/**'
       - './frontend/**'
-  push:
-    branches:
-      - main
-    paths:
-      - './backend/**'
-      - './frontend/**'
+
 permissions:
   id-token: write
   contents: read
@@ -20,6 +15,7 @@ jobs:
   Sonar-Scan:
     name: SonarQube Scan for Web Application Code  
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true  # Only run if the PR was merged
     steps:
       - uses: actions/checkout@v3
         with:
