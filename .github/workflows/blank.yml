@@ -16,14 +16,48 @@ jobs:
     name: SonarQube Scan for Web Application Code  
     runs-on: ubuntu-latest
     steps:
-      - name: Determine Working Directory and Sonar Token
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Determine Working Directory
         run: |
           working_dir="${{ github.event.pull_request.head.ref == 'backend' && './backend' || './frontend' }}"
-          #sonar_token="${{ github.event.pull_request.head.ref == 'backend' && secrets.SONAR_TOKEN_BACKEND || secrets.SONAR_TOKEN_FRONTEND }}"
          
           echo "Working Directory: $working_dir"
-          #echo "Sonar Token: $sonar_token"
 
-      - name: Echo Environment
+      # Backend Steps
+      - name: Set Up Python for Backend
+        if: github.event.pull_request.head.ref == 'backend'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies for Backend
+        if: github.event.pull_request.head.ref == 'backend'
+        run: python -m pip install -r backend/requirements.txt
+
+      - name: Run Python Unit Tests for Backend
+        if: github.event.pull_request.head.ref == 'backend'
         run: |
-          echo "Environment: ${{ github.ref_name }}"
+          echo "Running Python Unit Tests in $working_dir"
+          # Uncomment the line below to actually run the tests
+          # pytest backend --cov=backend --cov-report=xml
+
+      # Frontend Steps
+      - name: Set Up Node.js for Frontend
+        if: github.event.pull_request.head.ref == 'frontend'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install Dependencies for Frontend
+        if: github.event.pull_request.head.ref == 'frontend'
+        run: npm ci
+
+      - name: Run Angular Unit Tests with Coverage
+        if: github.event.pull_request.head.ref == 'frontend'
+        run: |
+          echo "Running Angular Unit Tests in $working_dir"
+          # Uncomment the line below to actually run the tests
+          # npm run test -- --code-coverage --watch=false
