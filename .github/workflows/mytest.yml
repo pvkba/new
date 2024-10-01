@@ -1,67 +1,17 @@
-name: "Sonar: SonarQube Web"
+name: Test Workflow
 
 on:
-  push:
-    branches:
-      - main  # Replace with your default branch if different
+  pull_request:
     paths:
-      - './backend/**'  # Monitor changes in the backend folder
-      - './frontend/**'  # Optional: Include frontend if needed
-
-permissions:
-  id-token: write
-  contents: read
+      - './backend/**'
+      - './frontend/**'
 
 jobs:
-  Sonar-Scan:
-    name: SonarQube Scan for Web Application Code  
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - name: Check Out Code
+        uses: actions/checkout@v3
 
-      # Determine Working Directory (optional based on your setup)
-      - name: Determine Working Directory
-        run: |
-          if git diff --name-only HEAD^ HEAD | grep -q '^backend/'; then
-            echo "Working Directory: ./backend"
-          else
-            echo "Working Directory: ./frontend"
-          fi
-
-      # Backend Steps
-      - name: Set Up Python for Backend
-        if: github.event.head_commit.message contains 'backend'  # This checks if 'backend' was in the commit message
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies for Backend
-        if: github.event.head_commit.message contains 'backend'
-        run: python -m pip install -r backend/requirements.txt
-
-      - name: Run Python Unit Tests for Backend
-        if: github.event.head_commit.message contains 'backend'
-        run: |
-          echo "Running Python Unit Tests in backend"
-          # Uncomment to run actual tests
-          # pytest backend --cov=backend --cov-report=xml
-
-      # Frontend Steps (if applicable)
-      - name: Set Up Node.js for Frontend
-        if: github.event.head_commit.message contains 'frontend'
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-
-      - name: Install Dependencies for Frontend
-        if: github.event.head_commit.message contains 'frontend'
-        run: npm ci
-
-      - name: Run Angular Unit Tests with Coverage
-        if: github.event.head_commit.message contains 'frontend'
-        run: |
-          echo "Running Angular Unit Tests"
-          # Uncomment to run actual tests
-          # npm run test -- --code-coverage --watch=false
+      - name: Print Hello World
+        run: echo "Hello, World! This is a test."
