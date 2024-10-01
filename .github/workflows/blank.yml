@@ -2,7 +2,13 @@ name: "Sonar: SonarQube Web"
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]  # Trigger for PR events
+    paths:
+      - './backend/**'
+      - './frontend/**'
+  push:
+    branches:
+      - main  # Trigger for pushes to the main branch
     paths:
       - './backend/**'
       - './frontend/**'
@@ -14,7 +20,7 @@ permissions:
 jobs:
   Sonar-Scan-Backend:
     name: SonarQube Scan for Backend Code  
-    if: github.event.action != 'closed'
+    if: github.event.action != 'closed'  # No need for this condition on push
     runs-on: ubuntu-latest
     steps:
       - name: Check for Backend Changes
@@ -26,7 +32,7 @@ jobs:
 
   Sonar-Scan-Frontend:
     name: SonarQube Scan for Frontend Code  
-    if: github.event.action != 'closed'
+    if: github.event.action != 'closed'  # No need for this condition on push
     runs-on: ubuntu-latest
     steps:
       - name: Check for Frontend Changes
