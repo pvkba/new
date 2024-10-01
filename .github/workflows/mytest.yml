@@ -1,22 +1,18 @@
-name: Test Workflow
+name: Pull Request Workflow
 
 on:
-  push:
-    paths:
-      - './backend/**'
-      - './frontend/**'
   pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - './backend/**'
       - './frontend/**'
-  workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Out Code
+      - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Print Hello World
-        run: echo "Hello, World! This is a test."
+        
+      - name: Run Tests
+        run: echo "Running tests for changed code!"
